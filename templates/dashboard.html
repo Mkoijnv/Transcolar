@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRANSCOLAR</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
+    <style>
+        #loading{position:fixed;width:100%;height:100%;background-color:white;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;}.spinner{border:8px solid #f3f3f3;border-top:8px solid #0056b3;border-radius:50%;width:60px;height:60px;animation:spin 1s linear infinite;margin-bottom:20px;}.progress-container{width:80%;background-color:#f3f3f3;border-radius:5px;overflow:hidden;margin-bottom:20px;}.progress-bar{height:10px;width:0;background-color:#0056b3;transition:width 0.4s;}.loading-text{color:#0056b3;font-size:18px;}.success-message{display:none;font-size:18px;color:green;}@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+        <div class="loading-text">Carregando...</div>
+        <div class="success-message">✅ OK, TUDO PRONTO!</div>
+    </div>
+    <div class="logo-container">
+        <h1 id="title">
+            <span class="bus-icon">&#128652;</span> Transcolar
+        </h1>
+    </div>
+    <label for="searchField" style="font-size:18px;font-weight:bold;">Pesquisar por:</label>
+    <select id="searchField" style="margin-left:10px;font-size:16px;padding:5px;">
+        <option value="nome_aluno">Nome do Aluno</option>
+        <option value="sre">SRE</option>
+        <option value="nome_escola">Nome da Escola</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="Digite para pesquisar..." style="margin-left:10px;font-size:16px;padding:5px;">
+    
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th data-name="sre">SRE</th>
+                <th data-name="nome_aluno">Nome do Aluno</th>
+                <th data-name="sigla_tipo_ensino">Sigla Tipo Ensino</th>
+                <th data-name="inep_escola">INEP Escola</th>
+                <th data-name="nome_escola">Nome da Escola</th>
+                <th data-name="tipo_dependencia">Tipo de Dependência</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row.sre }}</td>
+                <td>{{ row.nome_aluno }}</td>
+                <td>{{ row.sigla_tipo_ensino }}</td>
+                <td>{{ row.inep_escola }}</td>
+                <td>{{ row.nome_escola }}</td>
+                <td>{{ row.tipo_dependencia }}</td>
+                <td>
+                    <img src="{{ url_for('static', filename='home.webp') }}" alt="Ver Distância" style="cursor:pointer;width:30px;height:30px;" onclick="openMap('{{ row.sre }}', '{{ row.nome_escola }}')">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <p>© 2024 Consulta Transcolar - Todos os direitos reservados | Desenvolvido por GDMS</p>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#dataTable').DataTable({
+                "paging":true,
+                "pageLength":25,
+                "lengthMenu":[10,25,30,50,100],
+                "search":true,
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'csvHtml5',
+                        text: 'Exportar CSV',
+                        titleAttr: 'Exportar para CSV'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Exportar Excel',
+                        titleAttr: 'Exportar para Excel'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: 'Exportar PDF',
+                        titleAttr: 'Exportar para PDF'
+                    }
+                ]
+            });
+
+            $('#searchInput').on('keyup', function() {
+                var searchField = $('#searchField').val();
+                table.columns().search('').draw();
+                table.column(searchField + ':name').search(this.value).draw();
+            });
+
+            let progressBar = $('.progress-bar');
+            let loadingText = $('.loading-text');
+            let successMessage = $('.success-message');
+            let width = 0;
+            let interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    loadingText.hide();
+                    successMessage.show();
+                    setTimeout(() => {
+                        document.getElementById('loading').style.display = 'none';
+                    }, 2000);
+                } else {
+                    width++;
+                    progressBar.css('width', width + '%');
+                }
+            }, 30);
+        });
+
+        function openMap(sre, nomeEscola) {
+            const query = encodeURIComponent(sre + ' ' + nomeEscola);
+            const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>

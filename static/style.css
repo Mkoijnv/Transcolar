@@ -1,0 +1,103 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #e9ecef; /* Cor de fundo mais clara, neutra */
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid #dee2e6;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+th {
+    background-color: #0056b3;
+    color: white;
+    text-transform: uppercase;
+}
+
+tr:hover {
+    background-color: #f8f9fa;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 5px 10px;
+    margin: 2px;
+    border-radius: 4px;
+    background: #0056b3;
+    color: white;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #004085;
+}
+
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label {
+    font-weight: bold;
+    color: #495057;
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #004085; /* Cor de fundo contrastante para a "logo" */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative; /* Necessário para posicionar o ônibus dentro do container */
+    overflow: hidden; /* Garante que o ônibus "saia" do contêiner nas extremidades */
+    width: 100%; /* Garante que o container ocupe toda a largura */
+}
+
+#title {
+    color: #ffffff; /* Cor branca para o texto da logo */
+    font-size: 32px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    position: relative; /* Mantém a posição do texto intacta */
+}
+
+.bus-icon {
+    font-size: 40px; /* Tamanho maior para o ícone de ônibus */
+    position: absolute;
+    left: -50px; /* Começa fora da tela à esquerda */
+    animation: drive 8s infinite linear; /* Aumentamos o tempo para percorrer a largura */
+}
+
+@keyframes drive {
+    0% {
+        left: -900px; /* Começa fora do container, à esquerda */
+    }
+    50% {
+        left: calc(100% - 50px); /* Chega até o final do container */
+    }
+    100% {
+        left: 800%; /* Sai completamente do container à direita */
+    }
+}
